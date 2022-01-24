@@ -30,10 +30,10 @@ public class MinecraftServerPinger {
         this.port = port;
     }
 
-    public void connect() throws Exception {
+    public void connect(int timeout) throws Exception {
         InetSocketAddress host = new InetSocketAddress(address, port);
         Socket socket = new Socket();
-        socket.connect(host, 2000);
+        socket.connect(host, timeout);
         DataOutputStream output = new DataOutputStream(socket.getOutputStream());
         DataInputStream input = new DataInputStream(socket.getInputStream());
         byte[] handshakeMessage = createHandshakeMessage(address, port);
@@ -53,6 +53,7 @@ public class MinecraftServerPinger {
     }
 
     private void parseJson() {
+        if (!(json.startsWith("{") && json.endsWith("}"))) return;
         JSONObject jo = new JSONObject(json);
         description = String.valueOf(jo.optJSONObject("description"));
         if (description == null) description = jo.optString("description", null);
