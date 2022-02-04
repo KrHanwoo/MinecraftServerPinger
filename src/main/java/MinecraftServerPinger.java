@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class MinecraftServerPinger {
@@ -53,10 +54,14 @@ public class MinecraftServerPinger {
     }
 
     private void parseJson() {
-        if (!(json.startsWith("{") && json.endsWith("}"))) return;
-        JSONObject jo = new JSONObject(json);
-        description = String.valueOf(jo.optJSONObject("description"));
-        if (description == null) description = jo.optString("description", null);
+        JSONObject jo;
+        try {
+            jo = new JSONObject(json);
+        } catch (JSONException e) {
+            return;
+        }
+        JSONObject desc = jo.optJSONObject("description");
+        description = desc == null ? jo.optString("description", null) : String.valueOf(desc);
         favicon = jo.optString("favicon", null);
         if (jo.optJSONObject("players", new JSONObject()).has("online"))
             online = jo.optJSONObject("players").getInt("online");
